@@ -1,4 +1,4 @@
-%macro	syscall 1-*
+%macro  syscall 1-*
 
 %if %0 > 1
   push ebx
@@ -72,31 +72,31 @@ section .text
 ; int str_len(const char* message)
 ; String length calculation function
 str_len:
-				push  ebp
-        mov   ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-        mov   eax, [ebp + 8]
+        mov     eax, [ebp + 8]
 .next_char:
-        cmp   byte [eax], 0
-        jz    .return
-        inc   eax
-        jmp   .next_char
+        cmp     byte [eax], 0
+        jz      .return
+        inc     eax
+        jmp     .next_char
 .return:
-				sub 	eax, [ebp + 8]
-        mov   esp, ebp
-        pop   ebp
+        sub     eax, [ebp + 8]
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; void str_print(const char* message)
 ; String printing function
 str_print:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-        mov   	eax, [ebp + 8]
-    		push		eax
-    		call		str_len
-				add			esp, 4
+        mov     eax, [ebp + 8]
+        push    eax
+        call    str_len
+        add     esp, 4
 
         push    ebx
         push    edx
@@ -106,29 +106,29 @@ str_print:
         pop     edx
         pop     ebx
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; void print_lf()
 ; Print line feed
 print_lf:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
         push    dword nlstr
         call    str_print
         add     esp, 4
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; void print_int(int number)
 ; Print integer number
 print_int:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
         mov     eax, [ebp + 8]
 
@@ -136,89 +136,89 @@ print_int:
         push    esi
 
         mov     ecx, 10
-				add			ecx, uint_32_string
-				mov			byte [ecx], 0
+        add     ecx, uint_32_string
+        mov     byte [ecx], 0
 .divide_loop:
-				dec 		ecx
+        dec     ecx
         xor     edx, edx
         mov     esi, 10
         idiv    esi                 ; eax -> quotient edx -> remainder
         add     edx, 48
-        mov    	[ecx], dl
+        mov     [ecx], dl
         cmp     eax, 0
-				jnz 		.divide_loop
+        jnz     .divide_loop
 
-				push 		ecx
-				call 		str_print
-				call 		print_lf
-				add 		esp, 4
+        push    ecx
+        call    str_print
+        call    print_lf
+        add     esp, 4
 
-        pop    esi
-        pop    edx
+        pop     esi
+        pop     edx
 
-				mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; int atoi(const char* number)
 ; Ascii to integer (atoi)
 atoi:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-				push 		esi
-				push 		edx
-				push 		ebx
+        push    esi
+        push    edx
+        push    ebx
 
         mov     esi, [ebp + 8]          ; number to convert
-        xor     ecx, ecx               	; counter
-				xor 		eax, eax 								; result
+        xor     ecx, ecx                 ; counter
+        xor     eax, eax                 ; result
 
 .multiply_loop:
-				xor 		ebx, ebx
-				mov 		edx, 10									; radix
-				mov 		bl, [esi + ecx] 				; current char
-				cmp 		bl, 48 									; char code < 48 ('0') ?
-				jl 			.return
-				cmp 		bl, 57									; char code > 57 ('9') ?
-				jg			.return
+        xor     ebx, ebx
+        mov     edx, 10                  ; radix
+        mov     bl, [esi + ecx]         ; current char
+        cmp     bl, 48                   ; char code < 48 ('0') ?
+        jl      .return
+        cmp     bl, 57                  ; char code > 57 ('9') ?
+        jg      .return
 
-				mul 		edx                     ; eax * edx -> edx:eax
-				sub 		bl, 48 									; convert char to number
-				add 		eax, ebx
+        mul     edx                     ; eax * edx -> edx:eax
+        sub     bl, 48                   ; convert char to number
+        add     eax, ebx
 
-				inc 		ecx
-				jmp 		.multiply_loop
+        inc     ecx
+        jmp     .multiply_loop
 
 .return: 
-				pop 		ebx
-				pop 		edx
-				pop 		esi
+        pop     ebx
+        pop     edx
+        pop     esi
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; void read_input(char* buffer, int length)
 ; Read standard input
 read_input:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
         push    ebx
         push    edx
-				
-        mov			edx, [ebp + 12]
-    		mov     ecx, [ebp + 8]
-    		mov     ebx, SIN
-    		mov     eax, SYS_READ
-    		int     80h
+        
+        mov     edx, [ebp + 12]
+        mov     ecx, [ebp + 8]
+        mov     ebx, SIN
+        mov     eax, SYS_READ
+        int     80h
 
         pop     edx
         pop     ebx
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; int execve(const char* filename, const char *const *argv, const char *const *envp)
@@ -246,39 +246,39 @@ execve:
 ; int fork()
 ; Fork child process
 fork:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-    		mov     eax, SYS_FORK
-    		int     80h
+        mov     eax, SYS_FORK
+        int     80h
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; int time()
 ; Return Unix Epoch time
 time:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-    		mov     eax, SYS_TIME
-    		int     80h
+        mov     eax, SYS_TIME
+        int     80h
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
 ;------------------------------------------
 ; void exit()
 ; Exit program and restore resources
 exit:
-				push  	ebp
-        mov   	ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-    		mov     ebx, 0
-    		mov     eax, SYS_EXIT
-    		int     80h
+        mov     ebx, 0
+        mov     eax, SYS_EXIT
+        int     80h
 
-        mov   	esp, ebp
-        pop   	ebp
+        mov     esp, ebp
+        pop     ebp
         ret
